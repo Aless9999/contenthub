@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome Page</title>
+</head>
+<body>
+
+<!-- Если пользователь не аутентифицирован, показываем попап с предложением зарегистрироваться -->
+<div th:if="${showRegistrationPopup}">
+    <div class="registration-popup">
+        <h2>Welcome to our website!</h2>
+        <p>To get the most out of your experience, we recommend registering.</p>
+        <a href="/register">Click here to register</a>
+    </div>
+</div>
+
+<h1>Welcome to the Home Page!</h1>
+
+</body>
+</html>

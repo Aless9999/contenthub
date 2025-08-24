@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+</head>
+<body>
+<h1>Welcome, <span th:text="${user.username}">User</span>!</h1>
+
+<!-- Секция постов -->
+<h2>Posts</h2>
+<div th:each="post : ${posts}">
+    <div style="border:1px solid #ccc; margin-bottom:10px; padding:10px;">
+        <p><b th:text="${post.user.username}">Author</b> posted:</p>
+        <p><b>Title:</b> <span th:text="${post.title}">Post title</span></p>
+        <p><b>Caption:</b> <span th:text="${post.caption}">Caption</span></p>
+        <p><b>Location:</b> <span th:text="${post.location}">Location</span></p>
+
+        <!-- Комментарии -->
+        <div>
+            <h4>Comments</h4>
+            <div th:each="comment : ${post.comments}">
+                <p><b th:text="${comment.username}">User</b>: <span th:text="${comment.message}">Message</span></p>
+            </div>
+
+            <!-- Форма для добавления комментария -->
+            <form th:action="@{'/posts/' + ${post.id} + '/comment'}" method="post">
+                <input type="text" name="message" placeholder="Add a comment" required/>
+                <button type="submit">Comment</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Форма для создания нового поста -->
+<h2>Create New Post</h2>
+<form th:action="@{/posts/save}" method="post">
+    <input type="text" name="title" placeholder="Title" required/>
+    <input type="text" name="caption" placeholder="Caption"/>
+    <input type="text" name="location" placeholder="Location"/>
+    <button type="submit">Post</button>
+</form>
+
+<!-- Форма для загрузки изображения пользователя -->
+<h2>Upload Your Image</h2>
+<form th:action="@{/images/upload}" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required/>
+    <button type="submit">Upload</button>
+</form>
+
+<!-- Отображение всех изображений пользователя -->
+<h2>Your Images</h2>
+<div th:each="img : ${images}">
+    <img th:src="@{'/images/' + ${img.id}}" alt="User Image" width="150"/>
+</div>
+
+</body>
+</html>

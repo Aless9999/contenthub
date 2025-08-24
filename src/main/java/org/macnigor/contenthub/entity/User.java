@@ -1,0 +1,52 @@
+package org.macnigor.contenthub.entity;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
+import lombok.Data;
+import org.macnigor.contenthub.entity.enums.ERole;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Data
+@Entity
+@Table(name="users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false,updatable = false,unique = true)
+    private String username;
+    @Column(updatable = true)
+    private String name;
+    @Column(nullable = false)
+    private String lastname;
+    @Column(nullable = false, unique = true)
+    private String email;
+    @Column(nullable = false,length = 3000)
+    private String password;
+
+
+    @ElementCollection(targetClass = ERole.class)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING) // Хранить enum как строку
+    private Set<ERole> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
+    private List<Post> postList = new ArrayList<>();
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(updatable = false)
+    private LocalDateTime createDate;
+
+    @PrePersist
+    protected void onCreated() {
+        this.createDate = LocalDateTime.now();
+    }
+
+}
