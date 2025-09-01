@@ -46,4 +46,8 @@ public class ImageService {
             // В реальном приложении стоит использовать обработку ошибок (например, выбрасывать исключения или возвращать ошибку в ответ)
         }
     }
+
+    public ImageModel findById(Long id) {
+        return imageRepository.findById(id).orElseThrow(()->new RuntimeException("Image with id="+id+" not found"));
+    }
 }

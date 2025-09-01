@@ -1,8 +1,9 @@
-package org.macnigor.contenthub.services;
+package org.macnigor.contenthub.controllers;
 
 import org.macnigor.contenthub.dto.UserRegisterDto;
-import org.macnigor.contenthub.entity.Post;
-import org.macnigor.contenthub.entity.User;
+import org.macnigor.contenthub.services.ImageService;
+import org.macnigor.contenthub.services.PostService;
+import org.macnigor.contenthub.services.UserService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,9 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.security.Principal;
-import java.util.List;
 
 @Controller
 @RequestMapping
@@ -31,17 +29,7 @@ public class SecurityController {
         this.imageService = imageService;
     }
 
-    @GetMapping("/home")
-    public String homePage(Model model, Principal principal) {
-        User user = userService.findByUsername(principal.getName());
-        model.addAttribute("user", user);
 
-        // Получаем DTO постов для отображения (без циклических ссылок)
-        List<Post> posts = postService.getAllPosts();
-        model.addAttribute("posts", posts);
-
-        return "home";
-    }
 
 
     // Страница входа

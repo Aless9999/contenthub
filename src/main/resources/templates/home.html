@@ -73,12 +73,13 @@
 <h1 style="text-align:center;">Welcome, <span th:text="${user.username}">User</span>!</h1>
 
 <div class="container">
-    <!-- Список постов -->
+    <!-- Список постов (рендерит сервер) -->
     <div class="post-list">
         <h3>Your Posts</h3>
         <div th:each="post : ${posts}" class="post-item"
              th:text="${post.title}"
-             th:onclick="'showPost(' + ${post.id} + ')'"></div>
+             th:onclick="'showPost(' + ${post.id} + ')'">
+        </div>
     </div>
 
     <!-- Выбранный пост -->
@@ -103,52 +104,53 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const posts = /*[[${posts}]]*/ [];
-
-    function showPost(postId) {
-        const post = posts.find(p => p.id == postId);
-        const postDiv = document.getElementById('selectedPost');
-        postDiv.innerHTML = '';
-
-        if (!post) return;
-
-        let html = '<h2>' + post.title + '</h2>';
-        html += '<p>' + post.caption + '</p>';
-        html += '<p>Location: ' + (post.location || '') + '</p>';
-
-        if (post.images && post.images.length > 0) {
-            html += '<div class="post-images">';
-            post.images.forEach(img => {
-                html += '<img src="/images/' + img.id + '" alt="Image"/>';
-            });
-            html += '</div>';
-        }
-
-        html += '<div class="comments"><h4>Comments</h4>';
-        if (post.comments && post.comments.length > 0) {
-            post.comments.forEach(c => {
-                html += '<p><b>' + c.username + '</b>: ' + c.message + '</p>';
-            });
-        } else {
-            html += '<p>No comments yet</p>';
-        }
-        html += '</div>';
-
-        // Форма добавления комментария
-        html += '<form method="post" action="/posts/' + post.id + '/comment">';
-        html += '<input type="text" name="message" placeholder="Add a comment"/>';
-        html += '<button type="submit">Comment</button>';
-        html += '</form>';
-
-        // Форма добавления изображения
-        html += '<form method="post" action="/posts/' + post.id + '/saveimage" enctype="multipart/form-data">';
-        html += '<input type="file" name="image"/>';
-        html += '<button type="submit">Add Image</button>';
-        html += '</form>';
-
-        postDiv.innerHTML = html;
-    }
+        const posts = JSON.parse(/*[[${postsJson}]]*/ '[]');
     /*]]>*/
+
+        function showPost(postId) {
+            const post = posts.find(p => p.id == postId);
+            const postDiv = document.getElementById('selectedPost');
+            postDiv.innerHTML = '';
+
+            if (!post) return;
+
+            let html = '<h2>' + post.title + '</h2>';
+            html += '<p>' + (post.caption || '') + '</p>';
+            html += '<p>Location: ' + (post.location || '') + '</p>';
+
+            if (post.images && post.images.length > 0) {
+                html += '<div class="post-images">';
+                post.images.forEach(img => {
+                    html += '<img src="/images/' + img.id + '" alt="Image"/>';
+                });
+                html += '</div>';
+            }
+
+            html += '<div class="comments"><h4>Comments</h4>';
+            if (post.comments && post.comments.length > 0) {
+                post.comments.forEach(c => {
+                    html += '<p><b>' + c.username + '</b>: ' + c.message + '</p>';
+                });
+            } else {
+                html += '<p>No comments yet</p>';
+            }
+            html += '</div>';
+
+            // Форма добавления комментария
+            html += '<form method="post" action="/posts/' + post.id + '/comment">';
+            html += '<input type="text" name="message" placeholder="Add a comment"/>';
+            html += '<button type="submit">Comment</button>';
+            html += '</form>';
+
+            // Форма добавления изображения
+            html += '<form method="post" action="/posts/' + post.id + '/saveimage" enctype="multipart/form-data">';
+            html += '<input type="file" name="image"/>';
+            html += '<button type="submit">Add Image</button>';
+            html += '</form>';
+
+            postDiv.innerHTML = html;
+        }
 </script>
+
 </body>
 </html>

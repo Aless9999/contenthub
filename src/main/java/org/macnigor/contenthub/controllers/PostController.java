@@ -2,6 +2,7 @@ package org.macnigor.contenthub.controllers;
 
 import org.macnigor.contenthub.dto.ImageDto;
 import org.macnigor.contenthub.dto.PostDto;
+import org.macnigor.contenthub.entity.ImageModel;
 import org.macnigor.contenthub.entity.Post;
 import org.macnigor.contenthub.entity.User;
 import org.macnigor.contenthub.services.ImageService;
@@ -41,18 +42,10 @@ public class PostController {
     }
 
     @GetMapping("/home")
-    public String homePage(Model model, Authentication authentication) {
-        // Получаем текущего пользователя
-        String username = authentication.getName();
-        User currentUser = userService.findByUsername(username);
-
-
-        List<Post> allPosts = postService.getAllPosts();
-
-
-        model.addAttribute("user", currentUser);
-        model.addAttribute("posts", allPosts);
-
+    public String home(Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("posts", postService.getAllPosts());
         return "home";
     }
 
@@ -68,4 +61,6 @@ public class PostController {
 
         return "redirect:/home/"; // Перенаправление на страницу поста
     }
+
+
 }

@@ -1,9 +1,12 @@
 package org.macnigor.contenthub.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.macnigor.contenthub.entity.enums.ERole;
 
 import java.time.LocalDateTime;
@@ -12,7 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name="users")
 public class User {
@@ -39,7 +43,7 @@ public class User {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Set<ERole> roles = new HashSet<>();
-    @JsonIgnore
+    @JsonBackReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();
 

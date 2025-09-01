@@ -1,8 +1,6 @@
 package org.macnigor.contenthub.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -31,13 +29,13 @@ public class Post {
     @CollectionTable(name = "post_likes_user", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "username")
     private Set<String> likesUser = new HashSet<>();
-    @JsonIgnore
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     private User user; // ✅ Автор поста
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
-    @JsonIgnoreProperties
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageModel> images = new ArrayList<>();
 
