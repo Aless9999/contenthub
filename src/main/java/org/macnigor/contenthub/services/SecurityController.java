@@ -1,11 +1,8 @@
-package org.macnigor.contenthub.controllers;
+package org.macnigor.contenthub.services;
 
 import org.macnigor.contenthub.dto.UserRegisterDto;
 import org.macnigor.contenthub.entity.Post;
 import org.macnigor.contenthub.entity.User;
-import org.macnigor.contenthub.services.PostService;
-import org.macnigor.contenthub.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -23,31 +21,28 @@ import java.util.List;
 public class SecurityController {
 
 
-    private UserService userService;
+    private final UserService userService;
     private final PostService postService;
+    private final ImageService imageService;
 
-    @Autowired
-    public SecurityController(UserService userService, PostService postService) {
+    public SecurityController(UserService userService, PostService postService, ImageService imageService) {
         this.userService = userService;
         this.postService = postService;
+        this.imageService = imageService;
     }
-
 
     @GetMapping("/home")
-    public String homePage(Model model, Authentication authentication) {
-        // Получаем текущего пользователя
-        String username = authentication.getName();
-        User currentUser = userService.findByUsername(username);
+    public String homePage(Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
 
-        // Получаем все посты (свои и чужие)
-        List<Post> allPosts = postService.getAllPosts();
+        // Получаем DTO постов для отображения (без циклических ссылок)
+        List<Post> posts = postService.getAllPosts();
+        model.addAttribute("posts", posts);
 
-        // Добавляем в модель
-        model.addAttribute("user", currentUser);
-        model.addAttribute("posts", allPosts);
-
-        return "home"; // Шаблон home.html
+        return "home";
     }
+
 
     // Страница входа
     @GetMapping("/login")

@@ -1,6 +1,7 @@
 package org.macnigor.contenthub.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.macnigor.contenthub.entity.enums.ERole;
@@ -19,26 +20,34 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,updatable = false,unique = true)
+    @Column(nullable = false, updatable = false, unique = true)
     private String username;
-    @Column(updatable = true)
+
     private String name;
+
     @Column(nullable = false)
     private String lastname;
+
     @Column(nullable = false, unique = true)
     private String email;
-    @Column(nullable = false,length = 3000)
-    private String password;
 
+    @Column(nullable = false, length = 3000)
+    private String password;
 
     @ElementCollection(targetClass = ERole.class)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
-    @Enumerated(EnumType.STRING) // Хранить enum как строку
+    @Enumerated(EnumType.STRING)
     private Set<ERole> roles = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImageModel> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(updatable = false)
@@ -48,5 +57,4 @@ public class User {
     protected void onCreated() {
         this.createDate = LocalDateTime.now();
     }
-
 }

@@ -3,56 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <title>Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+        }
+        .post-list {
+            width: 25%;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            height: 80vh;
+            overflow-y: auto;
+        }
+        .post-content {
+            width: 75%;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            min-height: 80vh;
+        }
+        .post-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .post-item:hover {
+            background-color: #f0f0f0;
+        }
+        .post-images img {
+            width: 120px;
+            margin: 5px;
+            border-radius: 4px;
+        }
+        .comments {
+            margin-top: 15px;
+            padding-left: 10px;
+            border-left: 2px solid #ccc;
+        }
+        .comments p {
+            margin: 5px 0;
+        }
+        form {
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="file"] {
+            width: 90%;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<h1>Welcome, <span th:text="${user.username}">User</span>!</h1>
 
-<!-- Секция постов -->
-<h2>Posts</h2>
-<div th:each="post : ${posts}">
-    <div style="border:1px solid #ccc; margin-bottom:10px; padding:10px;">
-        <p><b th:text="${post.user.username}">Author</b> posted:</p>
-        <p><b>Title:</b> <span th:text="${post.title}">Post title</span></p>
-        <p><b>Caption:</b> <span th:text="${post.caption}">Caption</span></p>
-        <p><b>Location:</b> <span th:text="${post.location}">Location</span></p>
+<h1 style="text-align:center;">Welcome, <span th:text="${user.username}">User</span>!</h1>
 
-        <!-- Комментарии -->
-        <div>
-            <h4>Comments</h4>
-            <div th:each="comment : ${post.comments}">
-                <p><b th:text="${comment.username}">User</b>: <span th:text="${comment.message}">Message</span></p>
-            </div>
+<div class="container">
+    <!-- Список постов -->
+    <div class="post-list">
+        <h3>Your Posts</h3>
+        <div th:each="post : ${posts}" class="post-item"
+             th:text="${post.title}"
+             th:onclick="'showPost(' + ${post.id} + ')'"></div>
+    </div>
 
-            <!-- Форма для добавления комментария -->
-            <form th:action="@{'/posts/' + ${post.id} + '/comment'}" method="post">
-                <input type="text" name="message" placeholder="Add a comment" required/>
-                <button type="submit">Comment</button>
-            </form>
-        </div>
+    <!-- Выбранный пост -->
+    <div class="post-content" id="selectedPost">
+        <p>Select a post to view details</p>
     </div>
 </div>
 
-<!-- Форма для создания нового поста -->
-<h2>Create New Post</h2>
-<form th:action="@{/posts/save}" method="post">
-    <input type="text" name="title" placeholder="Title" required/>
-    <input type="text" name="caption" placeholder="Caption"/>
-    <input type="text" name="location" placeholder="Location"/>
-    <button type="submit">Post</button>
-</form>
-
-<!-- Форма для загрузки изображения пользователя -->
-<h2>Upload Your Image</h2>
-<form th:action="@{/images/upload}" method="post" enctype="multipart/form-data">
-    <input type="file" name="image" accept="image/*" required/>
-    <button type="submit">Upload</button>
-</form>
-
-<!-- Отображение всех изображений пользователя -->
-<h2>Your Images</h2>
-<div th:each="img : ${images}">
-    <img th:src="@{'/images/' + ${img.id}}" alt="User Image" width="150"/>
+<!-- Форма создания нового поста -->
+<div class="container">
+    <div style="width:100%; background-color:#fff; padding:15px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1);">
+        <h3>Create New Post</h3>
+        <form th:action="@{/posts/save}" method="post" enctype="multipart/form-data">
+            <input type="text" name="title" placeholder="Title" required/>
+            <input type="text" name="caption" placeholder="Caption"/>
+            <input type="text" name="location" placeholder="Location"/>
+            <input type="file" name="image"/>
+            <button type="submit">Post</button>
+        </form>
+    </div>
 </div>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const posts = /*[[${posts}]]*/ [];
+
+    function showPost(postId) {
+        const post = posts.find(p => p.id == postId);
+        const postDiv = document.getElementById('selectedPost');
+        postDiv.innerHTML = '';
+
+        if (!post) return;
+
+        let html = '<h2>' + post.title + '</h2>';
+        html += '<p>' + post.caption + '</p>';
+        html += '<p>Location: ' + (post.location || '') + '</p>';
+
+        if (post.images && post.images.length > 0) {
+            html += '<div class="post-images">';
+            post.images.forEach(img => {
+                html += '<img src="/images/' + img.id + '" alt="Image"/>';
+            });
+            html += '</div>';
+        }
+
+        html += '<div class="comments"><h4>Comments</h4>';
+        if (post.comments && post.comments.length > 0) {
+            post.comments.forEach(c => {
+                html += '<p><b>' + c.username + '</b>: ' + c.message + '</p>';
+            });
+        } else {
+            html += '<p>No comments yet</p>';
+        }
+        html += '</div>';
+
+        // Форма добавления комментария
+        html += '<form method="post" action="/posts/' + post.id + '/comment">';
+        html += '<input type="text" name="message" placeholder="Add a comment"/>';
+        html += '<button type="submit">Comment</button>';
+        html += '</form>';
+
+        // Форма добавления изображения
+        html += '<form method="post" action="/posts/' + post.id + '/saveimage" enctype="multipart/form-data">';
+        html += '<input type="file" name="image"/>';
+        html += '<button type="submit">Add Image</button>';
+        html += '</form>';
+
+        postDiv.innerHTML = html;
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

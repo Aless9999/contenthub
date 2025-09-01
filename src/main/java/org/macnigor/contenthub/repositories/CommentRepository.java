@@ -17,8 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     // Найти комментарии по пользователю
     List<Comment> findByUserId(Long userId);
 
-    // Найти комментарии по имени пользователя
-    List<Comment> findByUsername(String username);
+
 
     // Найти комментарии, созданные после определенной даты
     List<Comment> findByCreateDateAfter(LocalDateTime createDate);

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PostService {
 
@@ -39,5 +41,15 @@ public class PostService {
         postRepository.save(post);
 
         }
+
+    public List<Post> getAllPostsForUser(Long userId) {
+        return getAllPosts().stream()
+                .filter(post -> post.getUser().getId().equals(userId))
+                .collect(Collectors.toUnmodifiableList());
     }
+
+    public Post findById(Long postId) {
+        return postRepository.findPostById(postId).orElseThrow(()->new RuntimeException("Post with id="+postId +"not found"));
+    }
+}
 
