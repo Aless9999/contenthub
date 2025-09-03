@@ -32,7 +32,7 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public void createPost(PostDto postDto, User user) {
+    public Post createPost(PostDto postDto, User user) {
         Post post = new Post();
         post.setTitle(postDto.getTitle());
         post.setCaption(postDto.getCaption());
@@ -41,8 +41,8 @@ public class PostService {
 
         // Сохраняем сам пост
         postRepository.save(post);
-
-        }
+        return post;
+    }
 
     public List<Post> getAllPostsForUser(Long userId) {
         return getAllPosts().stream()
@@ -51,7 +51,7 @@ public class PostService {
     }
 
     public Post findById(Long postId) {
-        return postRepository.findPostById(postId).orElseThrow(()->new RuntimeException("Post with id="+postId +"not found"));
+        return postRepository.findPostById(postId).orElseThrow(() -> new RuntimeException("Post with id=" + postId + "not found"));
     }
 
     public Post getPostById(Long id) {

@@ -1,6 +1,6 @@
 package org.macnigor.contenthub.controllers;
 
-import org.macnigor.contenthub.dto.UserRegisterDto;
+import org.macnigor.contenthub.dto.UserDto;
 import org.macnigor.contenthub.services.ImageService;
 import org.macnigor.contenthub.services.PostService;
 import org.macnigor.contenthub.services.UserService;
@@ -50,12 +50,12 @@ public class SecurityController {
 
     @GetMapping("/register")
     public String registerUserForm(Model model) {
-        model.addAttribute("user", new UserRegisterDto()); // Передаем новый объект в модель
+        model.addAttribute("user", new UserDto()); // Передаем новый объект в модель
         return "register";  // Страница с формой
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute UserRegisterDto userRegisterDto) {
+    public String registerUser(@ModelAttribute UserDto userRegisterDto) {
         // Логика регистрации пользователя (сохранение в базе данных и т.д.)
         userService.createUser(userRegisterDto);
         // После успешной регистрации перенаправляем на страницу входа или домашнюю страницу

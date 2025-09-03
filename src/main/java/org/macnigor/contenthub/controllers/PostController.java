@@ -35,9 +35,10 @@ public class PostController {
     }
 
     @PostMapping("/save")
-    public String savePost(@ModelAttribute PostDto postDto, Principal principal){
+    public String savePost(@ModelAttribute PostDto postDto, Principal principal, @RequestParam("image") MultipartFile image){
         User user = userService.findByUsername(principal.getName());
-        postService.createPost(postDto, user);
+        Post post =  postService.createPost(postDto, user);
+        imageService.createImage(image, post, user);
         return "redirect:/home";
     }
 

@@ -3,7 +3,7 @@ package org.macnigor.contenthub.dto;
 import lombok.Data;
 
 @Data
-public class UserRegisterDto {
+public class UserDto {
 
     private String username;
     private String name;

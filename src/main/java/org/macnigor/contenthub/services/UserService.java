@@ -1,6 +1,6 @@
 package org.macnigor.contenthub.services;
 
-import org.macnigor.contenthub.dto.UserRegisterDto;
+import org.macnigor.contenthub.dto.UserDto;
 import org.macnigor.contenthub.entity.User;
 import org.macnigor.contenthub.entity.enums.ERole;
 import org.macnigor.contenthub.repositories.UserRepository;
@@ -50,7 +50,7 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
-    public User createUser(UserRegisterDto registerDto){
+    public User createUser(UserDto registerDto){
         if (existsByEmail(registerDto.getEmail()) || existsByUsername(registerDto.getUsername())) {
             throw new IllegalArgumentException("User with this email or username already exists");
         }
