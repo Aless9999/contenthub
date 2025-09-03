@@ -1,5 +1,6 @@
 package org.macnigor.contenthub.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.macnigor.contenthub.dto.UserDto;
 import org.macnigor.contenthub.services.ImageService;
 import org.macnigor.contenthub.services.PostService;
@@ -14,10 +15,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Slf4j
 @Controller
 @RequestMapping
 public class SecurityController {
-
 
     private final UserService userService;
     private final PostService postService;
@@ -29,37 +30,34 @@ public class SecurityController {
         this.imageService = imageService;
     }
 
-
-
-
     // Страница входа
     @GetMapping("/login")
     public String loginPage() {
-        // Получаем текущего аутентифицированного пользователя
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Проверяем, если пользователь уже залогинен, перенаправляем на главную страницу
+        // Логирование входа
         if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+            log.info("Пользователь уже авторизован: {}", authentication.getName());
             return "redirect:/home";  // Перенаправление на главную страницу
         }
 
-        // Если пользователь не залогинен, показываем страницу логина
+        log.info("Пользователь не авторизован, показываем страницу логина");
         return "login";  // Страница для входа
     }
 
-
     @GetMapping("/register")
     public String registerUserForm(Model model) {
+        log.info("Открыта страница регистрации пользователя.");
         model.addAttribute("user", new UserDto()); // Передаем новый объект в модель
         return "register";  // Страница с формой
     }
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute UserDto userRegisterDto) {
-        // Логика регистрации пользователя (сохранение в базе данных и т.д.)
+        log.info("Регистрация нового пользователя: {}", userRegisterDto.getUsername());
+        // Логика регистрации пользователя
         userService.createUser(userRegisterDto);
-        // После успешной регистрации перенаправляем на страницу входа или домашнюю страницу
+        log.info("Пользователь успешно зарегистрирован: {}", userRegisterDto.getUsername());
         return "redirect:/home";  // Перенаправление на страницу входа после регистрации
-    }}
-
-
+    }
+}

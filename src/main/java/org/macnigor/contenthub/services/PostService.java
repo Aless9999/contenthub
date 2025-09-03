@@ -9,8 +9,12 @@ import org.macnigor.contenthub.entity.User;
 import org.macnigor.contenthub.repositories.ImageRepository;
 import org.macnigor.contenthub.repositories.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,13 +32,33 @@ public class PostService {
     }
 
     public List<Post> getAllPosts() {
-        log.debug("Запрос всех постов");
-        List<Post> posts = postRepository.findAll();
-        log.info("Найдено {} пост(ов)", posts.size());
-        return posts;
+        try {
+            log.debug("Запрос всех постов");
+            List<Post> posts = postRepository.findAll();
+
+            if (posts == null) {
+                log.warn("Найдены пустые данные для постов.");
+                posts = new ArrayList<>(); // Защита от null
+            }
+
+            log.info("Найдено {} пост(ов)", posts.size());
+            return posts;
+
+        } catch (DataAccessException e) {
+            log.error("Ошибка доступа к базе данных при загрузке всех постов: {}", e.getMessage());
+            throw new RuntimeException("Ошибка доступа к базе данных при загрузке всех постов", e);
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка при загрузке всех постов: {}", e.getMessage());
+            throw new RuntimeException("Неожиданная ошибка при загрузке всех постов", e);
+        }
     }
 
+
     public Post createPost(PostDto postDto, User user) {
+        if (postDto == null || user == null) {
+            throw new IllegalArgumentException("PostDto и User не могут быть null");
+        }
+
         log.info("Создание поста пользователем: {}", user.getUsername());
         try {
             Post post = new Post();
@@ -47,21 +71,45 @@ public class PostService {
 
             log.info("Пост с id={} успешно создан пользователем {}", post.getId(), user.getUsername());
             return post;
+
+        } catch (DataIntegrityViolationException e) {
+            log.error("Ошибка при создании поста: нарушение целостности данных для пользователя {}", user.getUsername(), e);
+            throw new RuntimeException("Ошибка при создании поста: нарушение целостности данных", e);
         } catch (Exception e) {
-            log.error("Ошибка при создании поста пользователем {}", user.getUsername(), e);
-            throw e;
+            log.error("Неожиданная ошибка при создании поста пользователем {}", user.getUsername(), e);
+            throw new RuntimeException("Неожиданная ошибка при создании поста", e);
         }
     }
 
-    public List<Post> getAllPostsForUser(Long userId) {
-        log.debug("Запрос постов для пользователя id={}", userId);
-        List<Post> userPosts = getAllPosts().stream()
-                .filter(post -> post.getUser().getId().equals(userId))
-                .collect(Collectors.toUnmodifiableList());
 
-        log.info("Найдено {} пост(ов) для пользователя id={}", userPosts.size(), userId);
+    public List<Post> getAllPostsForUser(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
+        log.debug("Запрос постов для пользователя id={}", userId);
+
+        List<Post> userPosts;
+        try {
+            // Оптимизация: фильтруем на уровне базы данных, если это возможно
+            userPosts = Collections.singletonList(postRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("Posts for userId" + userId + "not found")));
+
+            // Если нельзя сделать запрос на уровне базы данных, фильтруем на уровне памяти
+            if (userPosts == null) {
+                userPosts = getAllPosts().stream()
+                        .filter(post -> post.getUser().getId().equals(userId))
+                        .collect(Collectors.toUnmodifiableList());
+            }
+
+            log.info("Найдено {} пост(ов) для пользователя id={}", userPosts.size(), userId);
+        } catch (Exception e) {
+            log.error("Ошибка при запросе постов для пользователя id={}", userId, e);
+            throw new RuntimeException("Ошибка при запросе постов для пользователя", e);
+        }
+
         return userPosts;
     }
+
 
     public Post findById(Long postId) {
         log.debug("Поиск поста по id={}", postId);

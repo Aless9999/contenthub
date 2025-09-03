@@ -25,4 +25,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // Найти все посты, которые были опубликованы после определенной даты
     List<Post> findPostsByCreateDateAfter(LocalDateTime createDate);
+
+    Optional<Post> findByUserId(Long userId);
 }
