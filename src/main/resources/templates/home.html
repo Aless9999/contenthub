@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Home Page</title>
+    <title>Домашняя страница</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,12 +70,12 @@
 </head>
 <body>
 
-<h1 style="text-align:center;">Welcome, <span th:text="${user.username}">User</span>!</h1>
+<h1 style="text-align:center;">Добро пожаловать, <span th:text="${user.username}">Пользователь</span>!</h1>
 
 <div class="container">
     <!-- Список постов (рендерит сервер) -->
     <div class="post-list">
-        <h3>Your Posts</h3>
+        <h3>Ваши посты</h3>
         <div th:each="post : ${posts}" class="post-item"
              th:text="${post.title}"
              th:onclick="'showPost(' + ${post.id} + ')'">
@@ -84,20 +84,20 @@
 
     <!-- Выбранный пост -->
     <div class="post-content" id="selectedPost">
-        <p>Select a post to view details</p>
+        <p>Выберите пост для просмотра деталей</p>
     </div>
 </div>
 
 <!-- Форма создания нового поста -->
 <div class="container">
     <div style="width:100%; background-color:#fff; padding:15px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1);">
-        <h3>Create New Post</h3>
+        <h3>Создать новый пост</h3>
         <form th:action="@{/posts/save}" method="post" enctype="multipart/form-data">
-            <input type="text" name="title" placeholder="Title" required/>
-            <input type="text" name="caption" placeholder="Caption"/>
-            <input type="text" name="location" placeholder="Location"/>
+            <input type="text" name="title" placeholder="Заголовок" required/>
+            <input type="text" name="caption" placeholder="Описание"/>
+            <input type="text" name="location" placeholder="Местоположение"/>
             <input type="file" name="image"/>
-            <button type="submit">Post</button>
+            <button type="submit">Опубликовать</button>
         </form>
     </div>
 </div>
@@ -116,36 +116,36 @@
 
             let html = '<h2>' + post.title + '</h2>';
             html += '<p>' + (post.caption || '') + '</p>';
-            html += '<p>Location: ' + (post.location || '') + '</p>';
+            html += '<p>Местоположение: ' + (post.location || '') + '</p>';
 
             if (post.images && post.images.length > 0) {
                 html += '<div class="post-images">';
                 post.images.forEach(img => {
-                    html += '<img src="/images/' + img.id + '" alt="Image"/>';
+                    html += '<img src="/images/' + img.id + '" alt="Изображение"/>';
                 });
                 html += '</div>';
             }
 
-            html += '<div class="comments"><h4>Comments</h4>';
+            html += '<div class="comments"><h4>Комментарии</h4>';
             if (post.comments && post.comments.length > 0) {
                 post.comments.forEach(c => {
                     html += '<p><b>' + c.username + '</b>: ' + c.message + '</p>';
                 });
             } else {
-                html += '<p>No comments yet</p>';
+                html += '<p>Комментариев пока нет</p>';
             }
             html += '</div>';
 
             // Форма добавления комментария
-            html += '<form method="post" action="/posts/' + post.id + '/comment">';
-            html += '<input type="text" name="message" placeholder="Add a comment"/>';
-            html += '<button type="submit">Comment</button>';
+            html += '<form method="post" action="/posts/' + post.id + '/comment/save">';
+            html += '<input type="text" name="message" placeholder="Добавьте комментарий"/>';
+            html += '<button type="submit">Комментарий</button>';
             html += '</form>';
 
             // Форма добавления изображения
             html += '<form method="post" action="/posts/' + post.id + '/saveimage" enctype="multipart/form-data">';
             html += '<input type="file" name="image"/>';
-            html += '<button type="submit">Add Image</button>';
+            html += '<button type="submit">Добавить изображение</button>';
             html += '</form>';
 
             postDiv.innerHTML = html;

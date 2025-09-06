@@ -1,5 +1,6 @@
 package org.macnigor.contenthub.repositories;
 
+import org.macnigor.contenthub.dto.CommentDto;
 import org.macnigor.contenthub.entity.Comment;
 import org.macnigor.contenthub.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,5 +25,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Найти комментарии по сообщению (поиск по части текста)
     List<Comment> findByMessageContaining(String message);
+
+    List<Comment> findCommentByPostId(Long id);
 }
 

@@ -3,10 +3,13 @@ package org.macnigor.contenthub.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.macnigor.contenthub.dto.CommentDto;
 import org.macnigor.contenthub.dto.PostDto;
+import org.macnigor.contenthub.entity.Comment;
 import org.macnigor.contenthub.entity.ImageModel;
 import org.macnigor.contenthub.entity.Post;
 import org.macnigor.contenthub.entity.User;
+import org.macnigor.contenthub.services.CommentService;
 import org.macnigor.contenthub.services.ImageService;
 import org.macnigor.contenthub.services.PostService;
 import org.macnigor.contenthub.services.UserService;
@@ -26,12 +29,13 @@ public class HomeController {
     private final PostService postService;
     private final ImageService imageService;
     private final ObjectMapper objectMapper;
-
+private final CommentService commentService;
     // Конструктор для инициализации зависимостей
-    public HomeController(UserService userService, PostService postService, ImageService imageService) {
+    public HomeController(UserService userService, PostService postService, ImageService imageService, CommentService commentService) {
         this.userService = userService;
         this.postService = postService;
         this.imageService = imageService;
+        this.commentService = commentService;
         this.objectMapper = new ObjectMapper(); // Создаем объект ObjectMapper один раз
     }
 
@@ -46,6 +50,10 @@ public class HomeController {
 
         // Получаем DTO постов
         List<PostDto> posts = postService.getAllPostDtos();
+        for(PostDto postDto:posts){
+            List<CommentDto>comments = commentService.getAllCommentForPost(postDto.getId());
+            postDto.setComments(comments);
+        }
         model.addAttribute("posts", posts); // для рендеринга списка заголовков
 
         // Преобразуем посты в JSON для JavaScript

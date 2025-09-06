@@ -1,6 +1,4 @@
-package org.macnigor.contenthub.exeption;
-
-import java.io.IOException;
+package org.macnigor.contenthub.exception;
 
 public class ImageUploadException extends RuntimeException {
     public ImageUploadException(String message,Throwable cause) {

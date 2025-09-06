@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.macnigor.contenthub.dto.UserDto;
 import org.macnigor.contenthub.entity.User;
 import org.macnigor.contenthub.entity.enums.ERole;
-import org.macnigor.contenthub.exeption.UserAlreadyExistsException;
+import org.macnigor.contenthub.exception.UserAlreadyExistsException;
 import org.macnigor.contenthub.repositories.UserRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

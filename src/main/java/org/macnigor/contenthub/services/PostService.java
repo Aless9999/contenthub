@@ -4,8 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.macnigor.contenthub.dto.CommentDto;
 import org.macnigor.contenthub.dto.ImageDto;
 import org.macnigor.contenthub.dto.PostDto;
+import org.macnigor.contenthub.entity.ImageModel;
 import org.macnigor.contenthub.entity.Post;
 import org.macnigor.contenthub.entity.User;
+import org.macnigor.contenthub.exception.PostNotFoundException;
+import org.macnigor.contenthub.mapper.ImageMapper;
+import org.macnigor.contenthub.mapper.PostMapper;
 import org.macnigor.contenthub.repositories.ImageRepository;
 import org.macnigor.contenthub.repositories.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,11 +29,14 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
-
+private final ImageMapper imageMapper;
+private final PostMapper postMapper;
     @Autowired
-    public PostService(PostRepository postRepository, ImageRepository imageRepository) {
+    public PostService(PostRepository postRepository, ImageRepository imageRepository, ImageMapper imageMapper, PostMapper postMapper) {
         this.postRepository = postRepository;
         this.imageRepository = imageRepository;
+        this.imageMapper = imageMapper;
+        this.postMapper = postMapper;
     }
 
     public List<Post> getAllPosts() {
@@ -164,4 +172,14 @@ public class PostService {
         return postDtos;
     }
 
+    public PostDto editPostByAdmin(Long id, PostDto postDto) {
+        Post oldPost = postRepository.findPostById(id).orElseThrow(() -> new PostNotFoundException("Post with id " + id + " not found"));
+        oldPost.setLocation(postDto.getLocation());
+        oldPost.setCaption(postDto.getCaption());
+        oldPost.setTitle(postDto.getTitle());
+        oldPost.setImages(postDto.getImages().stream()
+                .map(imageDto -> imageMapper.toEntity(imageDto,oldPost))
+                .collect(Collectors.toUnmodifiableList()));
+        return postMapper.toDto(oldPost);
+    }
 }

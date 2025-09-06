@@ -3,7 +3,7 @@ package org.macnigor.contenthub.services;
 import org.macnigor.contenthub.entity.ImageModel;
 import org.macnigor.contenthub.entity.Post;
 import org.macnigor.contenthub.entity.User;
-import org.macnigor.contenthub.exeption.ImageUploadException;
+import org.macnigor.contenthub.exception.ImageUploadException;
 import org.macnigor.contenthub.repositories.ImageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

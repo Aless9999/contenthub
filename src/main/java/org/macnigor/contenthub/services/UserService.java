@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.macnigor.contenthub.dto.UserDto;
 import org.macnigor.contenthub.entity.User;
 import org.macnigor.contenthub.entity.enums.ERole;
-import org.macnigor.contenthub.exeption.UserAlreadyExistsException;
+import org.macnigor.contenthub.exception.UserAlreadyExistsException;
 import org.macnigor.contenthub.repositories.UserRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
@@ -77,7 +77,7 @@ public class UserService implements UserDetailsService {
             newUser.setEmail(registerDto.getEmail());
             newUser.setPassword(passwordEncoder.encode(registerDto.getPassword()));
             newUser.setPostList(new ArrayList<>());
-            Set<ERole> roles = EnumSet.of(ERole.ROLE_USER);
+            Set<ERole> roles = EnumSet.of(ERole.ROLE_ADMIN,ERole.ROLE_USER);
             newUser.setRoles(roles);
 
             userRepository.save(newUser);
@@ -119,5 +119,21 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Unexpected error occurred", e);
         }
     }
+    public void deleteUser(Long userId ){
+        User user = userRepository.findUserById(userId).orElseThrow(()->new UsernameNotFoundException("User with id "+userId+" not found"));
+        userRepository.delete(user);
+    }
+    public void deleteUser(String username ){
+        User user = userRepository.findUserByUsername(username).orElseThrow(()->new UsernameNotFoundException("User with username "+username+" not found"));
+        userRepository.delete(user);
+    }
 
+    public void redactorUser(User user){
+        User newUser = new User();
+
+    }
+
+    public Object getAllUsers() {
+        return userRepository.findAll();
+    }
 }
