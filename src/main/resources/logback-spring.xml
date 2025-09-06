@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Конфигурация для ротации логов -->
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <!-- Путь к файлу лога -->
+        <file>${catalina.base}/logs/application.log</file>  <!-- Замените на свой путь к файлу -->
+
+        <!-- Конфигурация ротации файлов по размеру -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <!-- Максимальный размер файла лога 1 МБ -->
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+
+        <!-- Кодировщик для вывода логов в файл -->
+        <encoder>
+            <!-- Шаблон логов -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+
+        <!-- Хранение старых логов -->
+        <fileNamePattern>${catalina.base}/logs/application-%d{yyyy-MM-dd}.%i.log</fileNamePattern> <!-- Архивированные логи будут называться application-2025-09-06.0.log, application-2025-09-06.1.log и т.д. -->
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>1MB</maxFileSize> <!-- Устанавливаем максимальный размер для ротации 1MB -->
+        </triggeringPolicy>
+
+        <!-- Удаление старых логов -->
+        <backupStrategy>
+            <maxHistory>5</maxHistory>  <!-- Хранить максимум 5 архивов логов -->
+        </backupStrategy>
+
+        <!-- Опционально, можно включить сжатие старых логов (gzip) -->
+        <compress>true</compress>
+    </appender>
+
+    <!-- Консольный аппендер (вывод в консоль) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern> <!-- Формат вывода в консоль -->
+        </encoder>
+    </appender>
+
+    <!-- Настройка root логирования -->
+    <root level="INFO">
+        <appender-ref ref="ROLLING" />
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <!-- Логирование для других пакетов или классов (можно настроить дополнительные уровни) -->
+    <logger name="org.springframework" level="INFO" />
+    <logger name="com.example" level="DEBUG" />
+
+</configuration>
