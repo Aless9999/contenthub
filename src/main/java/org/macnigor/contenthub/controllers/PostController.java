@@ -94,6 +94,6 @@ public class PostController {
             log.error("Ошибка при сохранении изображения для поста с id={} пользователем {}", postId, username, e);
         }
 
-        return "redirect:/home/";
+        return "redirect:/home";
     }
 }
