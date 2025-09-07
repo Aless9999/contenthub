@@ -5,39 +5,28 @@
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
         <!-- Путь к файлу лога -->
-        <file>${catalina.base}/logs/application.log</file>  <!-- Замените на свой путь к файлу -->
+        <file>${catalina.base}/logs/application.log</file>
 
-        <!-- Конфигурация ротации файлов по размеру -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- Шаблон для именования файлов логов -->
-            <fileNamePattern>${catalina.base}/logs/application-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-
-            <!-- Максимальный размер для одного лог-файла -->
-            <maxFileSize>1MB</maxFileSize> <!-- Устанавливаем максимальный размер для ротации 1MB -->
-
-            <!-- Количество архивов, которые будут храниться -->
-            <maxHistory>5</maxHistory>  <!-- Хранить максимум 5 архивов логов -->
-
-            <!-- Опционально, включить сжатие архивированных логов -->
-            <compressionMode>GZ</compressionMode>
+        <!-- Политика ротации по размеру -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/logs/application.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>1MB</maxFileSize> <!-- Ротация при достижении 1MB -->
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>0</maxHistory> <!-- Не хранить старые файлы -->
         </rollingPolicy>
 
-        <!-- Кодировщик для вывода логов в файл -->
+        <!-- Кодировщик -->
         <encoder>
-            <!-- Шаблон логов -->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
 
-        <!-- Удаление старых логов -->
-        <backupStrategy>
-            <maxHistory>5</maxHistory> <!-- Хранить максимум 5 архивов логов -->
-        </backupStrategy>
     </appender>
 
-    <!-- Консольный аппендер (вывод в консоль) -->
+    <!-- Консольный аппендер -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern> <!-- Формат вывода в консоль -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -46,9 +35,5 @@
         <appender-ref ref="ROLLING" />
         <appender-ref ref="STDOUT" />
     </root>
-
-    <!-- Логирование для других пакетов или классов (можно настроить дополнительные уровни) -->
-    <logger name="org.springframework" level="INFO" />
-    <logger name="com.example" level="DEBUG" />
 
 </configuration>
