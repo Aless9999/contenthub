@@ -10,12 +10,22 @@
             margin: 0;
             padding: 0;
         }
+
+        h1 {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            margin: 0;
+        }
+
         .container {
             display: flex;
             max-width: 1200px;
             margin: 20px auto;
             gap: 20px;
         }
+
         .post-list {
             width: 25%;
             background-color: #fff;
@@ -25,6 +35,17 @@
             height: 80vh;
             overflow-y: auto;
         }
+
+        .post-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .post-item:hover {
+            background-color: #f0f0f0;
+        }
+
         .post-content {
             width: 75%;
             background-color: #fff;
@@ -33,70 +54,85 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             min-height: 80vh;
         }
-        .post-item {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            cursor: pointer;
-        }
-        .post-item:hover {
-            background-color: #f0f0f0;
-        }
+
         .post-images img {
             width: 120px;
             margin: 5px;
             border-radius: 4px;
         }
+
         .comments {
             margin-top: 15px;
             padding-left: 10px;
             border-left: 2px solid #ccc;
         }
+
         .comments p {
             margin: 5px 0;
         }
+
         form {
             margin-top: 10px;
         }
+
         input[type="text"], input[type="file"] {
             width: 90%;
-            padding: 5px;
+            padding: 6px;
             margin-bottom: 5px;
         }
+
         button {
-            padding: 5px 10px;
+            padding: 6px 10px;
             cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .new-post {
+            width: 100%;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
-<h1 style="text-align:center;">Добро пожаловать, <span th:text="${user.username}">Пользователь</span>!</h1>
+<h1>Добро пожаловать, <span th:text="${user.username}">Пользователь</span>!</h1>
 
 <div class="container">
-    <!-- Список постов (рендерит сервер) -->
+    <!-- Список постов -->
     <div class="post-list">
         <h3>Ваши посты</h3>
-        <div th:each="post : ${posts}" class="post-item"
+        <div th:each="post : ${posts}"
+             class="post-item"
              th:text="${post.title}"
              th:onclick="'showPost(' + ${post.id} + ')'">
         </div>
     </div>
 
-    <!-- Выбранный пост -->
+    <!-- Контент выбранного поста -->
     <div class="post-content" id="selectedPost">
         <p>Выберите пост для просмотра деталей</p>
     </div>
 </div>
 
-<!-- Форма создания нового поста -->
+<!-- Создание нового поста -->
 <div class="container">
-    <div style="width:100%; background-color:#fff; padding:15px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1);">
+    <div class="new-post">
         <h3>Создать новый пост</h3>
         <form th:action="@{/posts/save}" method="post" enctype="multipart/form-data">
-            <input type="text" name="title" placeholder="Заголовок" required/>
-            <input type="text" name="caption" placeholder="Описание"/>
-            <input type="text" name="location" placeholder="Местоположение"/>
-            <input type="file" name="image"/>
+            <input type="text" name="title" placeholder="Заголовок" required />
+            <input type="text" name="caption" placeholder="Описание" />
+            <input type="text" name="location" placeholder="Местоположение" />
+            <input type="file" name="image" />
             <button type="submit">Опубликовать</button>
         </form>
     </div>
@@ -104,52 +140,86 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-        const posts = JSON.parse(/*[[${postsJson}]]*/ '[]');
+    const posts = JSON.parse(/*[[${postsJson}]]*/ '[]');
     /*]]>*/
 
-        function showPost(postId) {
-            const post = posts.find(p => p.id == postId);
-            const postDiv = document.getElementById('selectedPost');
-            postDiv.innerHTML = '';
+    // Показать пост при клике
+    function showPost(postId) {
+        const post = posts.find(p => p.id == postId);
+        const postDiv = document.getElementById('selectedPost');
+        postDiv.innerHTML = '';
 
-            if (!post) return;
+        if (!post) return;
 
-            let html = '<h2>' + post.title + '</h2>';
-            html += '<p>' + (post.caption || '') + '</p>';
-            html += '<p>Местоположение: ' + (post.location || '') + '</p>';
+        let html = `<h2>${post.title}</h2>`;
+        html += `<p>${post.caption || ''}</p>`;
+        html += `<p>Местоположение: ${post.location || ''}</p>`;
 
-            if (post.images && post.images.length > 0) {
-                html += '<div class="post-images">';
-                post.images.forEach(img => {
-                    html += '<img src="/images/' + img.id + '" alt="Изображение"/>';
-                });
-                html += '</div>';
-            }
-
-            html += '<div class="comments"><h4>Комментарии</h4>';
-            if (post.comments && post.comments.length > 0) {
-                post.comments.forEach(c => {
-                    html += '<p><b>' + c.username + '</b>: ' + c.message + '</p>';
-                });
-            } else {
-                html += '<p>Комментариев пока нет</p>';
-            }
+        // Изображения поста
+        if (post.images && post.images.length > 0) {
+            html += '<div class="post-images">';
+            post.images.forEach(img => {
+                html += `<img src="/images/${img.id}" alt="Изображение"/>`;
+            });
             html += '</div>';
-
-            // Форма добавления комментария
-            html += '<form method="post" action="/posts/' + post.id + '/comment/save">';
-            html += '<input type="text" name="message" placeholder="Добавьте комментарий"/>';
-            html += '<button type="submit">Комментарий</button>';
-            html += '</form>';
-
-            // Форма добавления изображения
-            html += '<form method="post" action="/posts/' + post.id + '/saveimage" enctype="multipart/form-data">';
-            html += '<input type="file" name="image"/>';
-            html += '<button type="submit">Добавить изображение</button>';
-            html += '</form>';
-
-            postDiv.innerHTML = html;
         }
+
+        // Комментарии
+        html += `<div class="comments" id="comments-${post.id}"><h4>Комментарии</h4>`;
+        if (post.comments && post.comments.length > 0) {
+            post.comments.forEach(c => {
+                html += `<p><b>${c.username}</b>: ${c.message}</p>`;
+            });
+        } else {
+            html += '<p>Комментариев пока нет</p>';
+        }
+        html += '</div>';
+
+        // Форма добавления комментария (без перехода)
+        html += `
+            <form onsubmit="addComment(event, ${post.id})">
+                <input type="text" name="message" placeholder="Добавьте комментарий" required/>
+                <button type="submit">Комментарий</button>
+            </form>
+        `;
+
+        // Форма добавления изображения
+        html += `
+            <form method="post" action="/posts/${post.id}/saveimage" enctype="multipart/form-data">
+                <input type="file" name="image" />
+                <button type="submit">Добавить изображение</button>
+            </form>
+        `;
+
+        postDiv.innerHTML = html;
+    }
+
+    // Добавление комментария через fetch (AJAX)
+    function addComment(event, postId) {
+        event.preventDefault(); // отменяем переход
+
+        const form = event.target;
+        const message = form.querySelector('input[name="message"]').value.trim();
+        if (!message) return;
+
+        fetch(`/posts/${postId}/comment/save`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({message})
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка при добавлении комментария');
+            return response.text();
+        })
+        .then(() => {
+            const commentsDiv = document.getElementById(`comments-${postId}`);
+            const newComment = document.createElement('p');
+            newComment.innerHTML = `<b>Вы</b>: ${message}`;
+            commentsDiv.appendChild(newComment);
+            form.reset();
+        })
+        .catch(err => alert(err.message));
+    }
 </script>
 
 </body>
