@@ -2,6 +2,7 @@ package org.macnigor.contenthub.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.macnigor.contenthub.dto.PostDto;
+import org.macnigor.contenthub.entity.ImageModel;
 import org.macnigor.contenthub.entity.Post;
 import org.macnigor.contenthub.entity.User;
 import org.macnigor.contenthub.services.ImageService;
@@ -12,7 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
+import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RequestMapping("/posts")
@@ -72,28 +77,19 @@ public class PostController {
         return "home";
     }
 
-    @PostMapping("/{postId}/saveimage")
-    public String saveImage(@RequestParam("image") MultipartFile image,
-                            @PathVariable Long postId,
-                            Principal principal) {
-        String username = principal.getName();
-        log.info("Пользователь {} пытается сохранить изображение для поста с id={}", username, postId);
+    @PostMapping("/{id}/saveimage")
+    @ResponseBody
+    public Map<String, Object> uploadImage(@PathVariable Long id,
+                                           @RequestParam("image") MultipartFile file,Principal principal) throws IOException {
+        Post post = postService.getPostById(id);
+        User user = userService.findByUsername(principal.getName());
+        ImageModel saved =imageService.createImage(file,post,user);
 
-        try {
-            User user = userService.findByUsername(username);
-            Post post = postService.findById(postId);
 
-            if (post != null) {
-                log.debug("Изображение для поста id={} будет сохранено пользователем {}", postId, username);
-                imageService.createImage(image, post, user);
-                log.info("Изображение успешно сохранено для поста id={} пользователем {}", postId, username);
-            } else {
-                log.warn("Пост с id={} не найден. Пользователь {} не смог сохранить изображение", postId, username);
-            }
-        } catch (Exception e) {
-            log.error("Ошибка при сохранении изображения для поста с id={} пользователем {}", postId, username, e);
-        }
-
-        return "redirect:/home";
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", saved.getId());
+        response.put("url", "/images/" + saved.getId());
+        return response;
     }
+
 }

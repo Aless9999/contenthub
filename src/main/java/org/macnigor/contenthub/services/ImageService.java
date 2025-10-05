@@ -39,7 +39,7 @@ public class ImageService {
     }
 
     // Создание изображения для поста
-    public void createImage(MultipartFile image, Post post, User user) {
+    public ImageModel createImage(MultipartFile image, Post post, User user) {
         log.info("Попытка создать изображение для поста с id: {} пользователем: {}", post.getId(), user.getUsername());
 
         if (image.isEmpty()) {
@@ -67,6 +67,7 @@ public class ImageService {
             imageRepository.save(newImage);
 
             log.info("Изображение с именем '{}' успешно создано и сохранено для поста с id: {}", image.getOriginalFilename(), post.getId());
+            return newImage;
         } catch (IOException e) {
             log.error("Ошибка при создании изображения для поста с id: {} пользователем: {}. Ошибка: {}", post.getId(), user.getUsername(), e.getMessage(), e);
             throw new ImageUploadException("Ошибка при загрузке изображения", e);

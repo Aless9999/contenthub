@@ -143,7 +143,7 @@
     const posts = JSON.parse(/*[[${postsJson}]]*/ '[]');
     /*]]>*/
 
-    // Показать пост при клике
+    // Показать пост
     function showPost(postId) {
         const post = posts.find(p => p.id == postId);
         const postDiv = document.getElementById('selectedPost');
@@ -155,14 +155,16 @@
         html += `<p>${post.caption || ''}</p>`;
         html += `<p>Местоположение: ${post.location || ''}</p>`;
 
-        // Изображения поста
+        // Изображения
+        html += `<div class="post-images" id="images-${post.id}">`;
         if (post.images && post.images.length > 0) {
-            html += '<div class="post-images">';
             post.images.forEach(img => {
                 html += `<img src="/images/${img.id}" alt="Изображение"/>`;
             });
-            html += '</div>';
+        } else {
+            html += '<p>Изображений пока нет</p>';
         }
+        html += '</div>';
 
         // Комментарии
         html += `<div class="comments" id="comments-${post.id}"><h4>Комментарии</h4>`;
@@ -175,7 +177,7 @@
         }
         html += '</div>';
 
-        // Форма добавления комментария (без перехода)
+        // Добавление комментария
         html += `
             <form onsubmit="addComment(event, ${post.id})">
                 <input type="text" name="message" placeholder="Добавьте комментарий" required/>
@@ -183,10 +185,10 @@
             </form>
         `;
 
-        // Форма добавления изображения
+        // Добавление изображения (AJAX)
         html += `
-            <form method="post" action="/posts/${post.id}/saveimage" enctype="multipart/form-data">
-                <input type="file" name="image" />
+            <form onsubmit="addImage(event, ${post.id})" enctype="multipart/form-data">
+                <input type="file" name="image" required />
                 <button type="submit">Добавить изображение</button>
             </form>
         `;
@@ -194,9 +196,9 @@
         postDiv.innerHTML = html;
     }
 
-    // Добавление комментария через fetch (AJAX)
+    // --- Добавление комментария ---
     function addComment(event, postId) {
-        event.preventDefault(); // отменяем переход
+        event.preventDefault();
 
         const form = event.target;
         const message = form.querySelector('input[name="message"]').value.trim();
@@ -216,6 +218,36 @@
             const newComment = document.createElement('p');
             newComment.innerHTML = `<b>Вы</b>: ${message}`;
             commentsDiv.appendChild(newComment);
+            form.reset();
+        })
+        .catch(err => alert(err.message));
+    }
+
+    // --- Добавление изображения через AJAX ---
+    function addImage(event, postId) {
+        event.preventDefault();
+
+        const form = event.target;
+        const fileInput = form.querySelector('input[name="image"]');
+        if (!fileInput.files.length) return;
+
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        fetch(`/posts/${postId}/saveimage`, {
+    method: 'POST',
+    body: formData
+})
+.then(response => {
+    if (!response.ok) throw new Error('Ошибка при загрузке изображения');
+    return response.json();
+})
+        .then(image => {
+            const imagesDiv = document.getElementById(`images-${postId}`);
+            const newImg = document.createElement('img');
+            newImg.src = `/images/${image.id}`;
+            newImg.alt = 'Изображение';
+            imagesDiv.appendChild(newImg);
             form.reset();
         })
         .catch(err => alert(err.message));
