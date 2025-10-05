@@ -30,7 +30,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()  // Все остальные страницы требуют аутентификации
                 )
                 .formLogin(form -> form
-
+                        .loginPage("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .failureUrl("/login?error=true")
                         .defaultSuccessUrl("/home", true)  // Перенаправление на /home после успешного логина
                         .permitAll()  // Открытый доступ к странице логина
                 )
