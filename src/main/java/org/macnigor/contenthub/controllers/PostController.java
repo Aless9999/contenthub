@@ -37,26 +37,36 @@ public class PostController {
     @PostMapping("/save")
     public String savePost(@ModelAttribute PostDto postDto,
                            Principal principal,
-                           @RequestParam("image") MultipartFile image) {
+                           @RequestParam(value = "image", required = false) MultipartFile image) {
         String username = principal.getName();
         log.info("Пользователь {} создает новый пост с заголовком: {}", username, postDto.getTitle());
 
         try {
             User user = userService.findByUsername(username);
             Post post = postService.createPost(postDto, user);
-
-            // Логируем информацию о создании поста
             log.debug("Создан новый пост с id={} для пользователя {}", post.getId(), username);
 
-            imageService.createImage(image, post, user);
-            log.info("Изображение успешно загружено для поста id={} пользователем {}", post.getId(), username);
+            // Проверяем, был ли файл прикреплён
+            if (image != null && !image.isEmpty()) {
+                try {
+                    imageService.createImage(image, post, user);
+                    log.info("Изображение успешно загружено для поста id={} пользователем {}", post.getId(), username);
+                } catch (Exception imgEx) {
+                    log.error("Ошибка при сохранении изображения для поста {}: {}", post.getId(), imgEx.getMessage(), imgEx);
+                    // не прерываем выполнение, просто логируем
+                }
+            } else {
+                log.debug("Изображение не прикреплено, пост сохраняется без картинки");
+            }
 
             return "redirect:/home";
         } catch (Exception e) {
-            log.error("Ошибка при создании поста для пользователя {}. Ошибка: {}", username, e.getMessage(), e);
-            throw e;
+            log.error("Ошибка при создании поста пользователем {}: {}", username, e.getMessage(), e);
+            // можно вернуть страницу с ошибкой, но без 500
+            return "redirect:/home?error=post";
         }
     }
+
 
     @GetMapping("/home")
     public String home(Model model, Principal principal) {

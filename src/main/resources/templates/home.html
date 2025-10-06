@@ -130,7 +130,7 @@
         <h3>Создать новый пост</h3>
         <form th:action="@{/posts/save}" method="post" enctype="multipart/form-data">
             <input type="text" name="title" placeholder="Заголовок" required />
-            <input type="text" name="caption" placeholder="Описание" />
+            <input type="text" name="caption" placeholder="Содержание" />
             <input type="text" name="location" placeholder="Местоположение" />
             <input type="file" name="image" />
             <button type="submit">Опубликовать</button>
