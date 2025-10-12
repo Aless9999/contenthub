@@ -13,11 +13,7 @@ public class ImageMapper {
         ImageModel model = new ImageModel();
         model.setName(dto.getName());
         model.setPost(post);
-        try {
-            model.setImageSize(dto.getImage().getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при чтении файла", e);
-        }
+        model.setImageUrl(dto.getImageUrl());
         return model;
     }
 }

@@ -14,7 +14,7 @@ public class CommentMapper {
         return dto;
     }
 
-    public Comment toEntity(CommentDto commentDto, Post oldPost) {
+    public static Comment toEntity(CommentDto commentDto, Post oldPost) {
         Comment comment = new Comment();
         comment.setMessage(commentDto.getMessage());
         comment.setPost(oldPost);

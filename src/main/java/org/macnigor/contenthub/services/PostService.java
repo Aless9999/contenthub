@@ -115,6 +115,7 @@ public class PostService {
                                     .map(img -> {
                                         ImageDto i = new ImageDto();
                                         i.setId(img.getId());
+                                        i.setImageUrl(img.getImageUrl());
                                         return i;
                                     })
                                     .toList()

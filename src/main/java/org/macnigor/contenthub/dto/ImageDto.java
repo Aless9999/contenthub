@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageDto {
     private Long id;
     private String name;
-    private MultipartFile image;
+    private String imageUrl;
     private User user;
     private Post post;
 }

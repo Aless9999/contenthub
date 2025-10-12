@@ -145,7 +145,7 @@
         html += `<div class="post-images d-flex flex-wrap" id="images-${post.id}">`;
         if (post.images?.length) {
             post.images.forEach(img => {
-                html += `<img src="/images/${img.id}" alt="Изображение"/>`;
+                html += `<img src="${img.imageUrl}" alt="Изображениепоста"/>`;
             });
         } else {
             html += '<p class="text-muted">Изображений пока нет</p>';
@@ -221,7 +221,7 @@
             .then(r => r.ok ? r.json() : Promise.reject())
             .then(img => {
                 const images = document.getElementById(`images-${postId}`);
-                images.insertAdjacentHTML('beforeend', `<img src="/images/${img.id}" alt="Изображение"/>`);
+                images.insertAdjacentHTML('beforeend', `<img src="${img.url}" alt="Изображение"/>`);
                 form.reset();
             });
     }

@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 
@@ -39,7 +42,7 @@ public class ImageService {
     }
 
     // Создание изображения для поста
-    public ImageModel createImage(MultipartFile image, Post post, User user) {
+    public ImageModel createImage(MultipartFile image, Post post, User user) throws IOException {
         log.info("Попытка создать изображение для поста с id: {} пользователем: {}", post.getId(), user.getUsername());
 
         if (image.isEmpty()) {
@@ -47,31 +50,34 @@ public class ImageService {
             throw new IllegalArgumentException("Пустой файл изображения");
         }
 
-        try {
-            // Создаем новый объект ImageModel
-            ImageModel newImage = new ImageModel();
+        // Создаем новый объект ImageModel
+        ImageModel newImage = new ImageModel();
 
-            // Устанавливаем имя файла изображения
-            newImage.setName(image.getOriginalFilename());
-            log.debug("Имя файла изображения: {}", image.getOriginalFilename());
+        // Устанавливаем имя файла изображения
+        String fileName = image.getOriginalFilename();
+        newImage.setName(fileName);
+        log.debug("Имя файла изображения: {}", fileName);
 
-            // Сохраняем файл как массив байтов
-            newImage.setImageSize(image.getBytes());
-            log.debug("Размер изображения (в байтах): {}", image.getBytes().length);
+        // Создаем папку для хранения изображений
+        File fileDir = new File("ImageContent");
+        //Сохраняем изображение в папку на сервере
+        Path path = Path.of("ImageContent",fileName);
+        Files.copy(image.getInputStream(),path);
 
-            // Устанавливаем пользователя и пост
-            newImage.setUser(user);
-            newImage.setPost(post);
+        // Сохраняем ссылку на файл
+        String imageUrl = "/ImageContent/"+image.getOriginalFilename();
+        newImage.setImageUrl(imageUrl);
+        log.debug("Ссылка на изображение: {}", imageUrl);
 
-            // Сохраняем изображение в базе данных
-            imageRepository.save(newImage);
+        // Устанавливаем пользователя и пост
+        newImage.setUser(user);
+        newImage.setPost(post);
 
-            log.info("Изображение с именем '{}' успешно создано и сохранено для поста с id: {}", image.getOriginalFilename(), post.getId());
-            return newImage;
-        } catch (IOException e) {
-            log.error("Ошибка при создании изображения для поста с id: {} пользователем: {}. Ошибка: {}", post.getId(), user.getUsername(), e.getMessage(), e);
-            throw new ImageUploadException("Ошибка при загрузке изображения", e);
-        }
+        // Сохраняем изображение в базе данных
+        imageRepository.save(newImage);
+
+        log.info("Изображение с именем '{}' успешно создано и сохранено для поста с id: {}", image.getOriginalFilename(), post.getId());
+        return newImage;
     }
 
     // Поиск изображения по его ID

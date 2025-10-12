@@ -8,14 +8,13 @@ import java.util.stream.Collectors;
 
 @Component
 public class PostMapper {
-
 private final CommentMapper commentMapper;
 
     public PostMapper(CommentMapper commentMapper) {
         this.commentMapper = commentMapper;
     }
 
-    public PostDto toDto(Post post) {
+    public  PostDto toDto(Post post) {
         PostDto dto = new PostDto();
         dto.setId(post.getId());
         dto.setComments(
