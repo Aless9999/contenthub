@@ -82,6 +82,12 @@
 			<version>9.2.0</version> <!-- Убедитесь, что версия актуальна -->
 		</dependency>
 
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
+
+
 
 
 

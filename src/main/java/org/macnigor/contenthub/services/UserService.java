@@ -60,11 +60,12 @@ public class UserService implements UserDetailsService {
     private Collection<? extends GrantedAuthority> getAuthorities(Set<ERole> roles) {
         log.debug("Converting roles {} to authorities", roles);
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .map(role -> new SimpleGrantedAuthority( role.name()))
                 .collect(Collectors.toList());
     }
 
     public User createUser(UserDto registerDto) {
+        Set<ERole> roles = new HashSet<>();
         try {
             if (existsByEmail(registerDto.getEmail()) || existsByUsername(registerDto.getUsername())) {
                 throw new UserAlreadyExistsException("User with this email or username already exists");
@@ -77,7 +78,10 @@ public class UserService implements UserDetailsService {
             newUser.setEmail(registerDto.getEmail());
             newUser.setPassword(passwordEncoder.encode(registerDto.getPassword()));
             newUser.setPostList(new ArrayList<>());
-            Set<ERole> roles = EnumSet.of(ERole.ROLE_ADMIN,ERole.ROLE_USER);
+            if(registerDto.getUsername().equals("admin")){
+                roles.add(ERole.ROLE_ADMIN);
+            }
+            roles.add(ERole.ROLE_USER);
             newUser.setRoles(roles);
 
             userRepository.save(newUser);

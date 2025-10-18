@@ -60,6 +60,12 @@ public class ImageService {
 
         // Создаем папку для хранения изображений
         File fileDir = new File("ImageContent");
+        if (!fileDir.exists()) {
+            boolean created = fileDir.mkdir(); // или mkdirs()
+            if (!created) {
+                throw new IOException("Не удалось создать папку для изображений: " + fileDir.getAbsolutePath());
+            }
+        }
         //Сохраняем изображение в папку на сервере
         Path path = Path.of("ImageContent",fileName);
         Files.copy(image.getInputStream(),path);
