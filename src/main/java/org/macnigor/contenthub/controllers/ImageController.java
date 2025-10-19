@@ -20,29 +20,7 @@ public class ImageController {
         this.imageService = imageService;
     }
 
-    /*@GetMapping("/images/{id}")
-    @ResponseBody
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
-        log.info("Запрос изображения с id={}", id);
 
-        // Попытка найти изображение по id
-        ImageModel image = imageService.findById(id);
-
-        if (image == null) {
-            // Логирование и возврат ошибки 404 если изображение не найдено
-            log.warn("Изображение с id={} не найдено.", id);
-            return ResponseEntity.notFound().build();
-        }
-
-        log.info("Изображение с id={} найдено, отправка данных клиенту.", id);
-
-        // Получаем изображение в формате BLOB из базы данных
-        byte[] bytes = image.getImageSize();
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)  // Здесь можно менять на другой тип изображения, если необходимо
-                .body(bytes);
-    }*/
     @GetMapping("/images/{id}")
     @ResponseBody
     public ResponseEntity<String> getImage(@PathVariable Long id) {

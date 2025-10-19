@@ -17,6 +17,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,12 +30,15 @@ public class PostService {
     private final PostRepository postRepository;
     private final ImageMapper imageMapper;
     private final CommentMapper commentMapper;
+    private final PostMapper postMapper;
 
     @Autowired
-    public PostService(PostRepository postRepository, ImageRepository imageRepository, ImageMapper imageMapper, PostMapper postMapper, CommentMapper commentMapper) {
+    public PostService(PostRepository postRepository, ImageRepository imageRepository, ImageMapper imageMapper, CommentMapper commentMapper,  PostMapper postMapper) {
         this.postRepository = postRepository;
         this.imageMapper = imageMapper;
         this.commentMapper = commentMapper;
+
+        this.postMapper = postMapper;
     }
 
     public List<Post> getAllPosts() {
@@ -188,6 +192,11 @@ public class PostService {
 
         // Логирование успешного завершения обновления
         log.info("Пост с id = {} успешно обновлен.", id);
+    }
+
+    public void deletePostById(Long id) {
+        Post post = postRepository.findPostById(id).orElseThrow();
+       postRepository.delete(post);
     }
 }
 

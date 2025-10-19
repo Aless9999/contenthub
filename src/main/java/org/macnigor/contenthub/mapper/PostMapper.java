@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 @Component
 public class PostMapper {
 private final CommentMapper commentMapper;
+private final ImageMapper imageMapper;
 
-    public PostMapper(CommentMapper commentMapper) {
+    public PostMapper(CommentMapper commentMapper, ImageMapper imageMapper) {
         this.commentMapper = commentMapper;
+        this.imageMapper = imageMapper;
     }
 
     public  PostDto toDto(Post post) {
@@ -24,4 +26,6 @@ private final CommentMapper commentMapper;
         );
         return dto;
     }
+
+
 }

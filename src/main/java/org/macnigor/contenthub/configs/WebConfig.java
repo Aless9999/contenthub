@@ -17,7 +17,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+        String currentImagePath = (imagePath.startsWith("/opt")) ? imagePath : "file:" + imagePath;
         registry.addResourceHandler(imageUrl)
-                .addResourceLocations(imagePath);
+
+                .addResourceLocations(currentImagePath);
     }
 }

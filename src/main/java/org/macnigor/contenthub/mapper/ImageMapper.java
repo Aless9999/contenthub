@@ -5,7 +5,9 @@ import org.macnigor.contenthub.entity.ImageModel;
 import org.macnigor.contenthub.entity.Post;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class ImageMapper {
@@ -16,5 +18,10 @@ public class ImageMapper {
         model.setImageUrl(dto.getImageUrl());
         return model;
     }
-}
+
+
+    }
+
+
+
 
