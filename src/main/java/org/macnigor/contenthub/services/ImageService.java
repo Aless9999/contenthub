@@ -141,8 +141,6 @@ public class ImageService {
             return;
         }
 
-        String currentImagePath = (imagePath.startsWith("/opt")) ? imagePath : "file:" + imagePath;
-
         File file = new File(imagePath + image.getName());
 
         if (file.exists()) {

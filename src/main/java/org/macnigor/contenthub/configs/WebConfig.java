@@ -1,10 +1,12 @@
 package org.macnigor.contenthub.configs;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@Slf4j
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -12,15 +14,16 @@ public class WebConfig implements WebMvcConfigurer {
     private String imageUrl;
 
     @Value("${app.images.path}")
-    private String imagePath;
-
+    private String imageDir;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
-        String currentImagePath = (imagePath.startsWith("/opt")) ? imagePath : "file:" + imagePath;
+        String location = "file:" + imageDir;
         registry.addResourceHandler(imageUrl)
+                .addResourceLocations(location);
 
-                .addResourceLocations(currentImagePath);
+        log.info("📂 Настройка статических ресурсов: {} → {}", imageUrl, location);
     }
 }
+
+

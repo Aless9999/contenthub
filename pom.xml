@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.macnigor</groupId>
 	<artifactId>contenthub</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>contenthub</name>
 	<description>A simple blog platform with user authentication, role-based access control, and content management</description>
 	<url/>
@@ -76,19 +76,12 @@
 			<optional>true</optional>
 		</dependency>
 
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>9.2.0</version> <!-- Убедитесь, что версия актуальна -->
-		</dependency>
+
 
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
-
-
-
 
 
 		<dependency>
