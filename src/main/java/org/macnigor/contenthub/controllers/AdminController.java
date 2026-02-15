@@ -2,13 +2,20 @@ package org.macnigor.contenthub.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.macnigor.contenthub.dto.PostDto;
+import org.macnigor.contenthub.dto.TaskPayload;
+import org.macnigor.contenthub.entity.User;
 import org.macnigor.contenthub.services.ImageService;
 import org.macnigor.contenthub.services.PostService;
 import org.macnigor.contenthub.services.UserService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.config.Task;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -60,4 +67,8 @@ public class AdminController {
         log.info("Пост с ID: {} успешно удален.", id);
         return "redirect:/admin/dashboard";
     }
+
+
+
+
 }
